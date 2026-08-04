@@ -2,3 +2,8 @@ __pycache__/
 .env
 node_modules/
 venv/
+storage/
+*.epub
+*.pdf
+*.mobi
+*.txt

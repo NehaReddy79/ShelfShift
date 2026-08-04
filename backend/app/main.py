@@ -1,4 +1,7 @@
-from fastapi import FastAPI , UploadFile , File , HTTPException
+from fastapi import FastAPI , UploadFile , File , HTTPException , Depends
+from sqlalchemy.orm import Session
+from app.database import get_db
+from app.models import Job
 import os
 
 app = FastAPI()
@@ -9,7 +12,7 @@ def root():
     return {"message" : "Working"}
 
 @app.post("/convert")
-async def file_upload(file : UploadFile = File(...)):
+async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get_db)):
     if not file.filename :
         raise HTTPException(status_code=400 , detail = "No file found")
     
@@ -20,7 +23,14 @@ async def file_upload(file : UploadFile = File(...)):
     with open(filepath , "wb") as buffer : 
         buffer.write(contents)
 
+    new_job = Job(user_id = 1 , status = "queued" , source_format = file.filename.split(".")[-1].lower() , target_format = "pdf")
+    db.add(new_job)
+    db.commit()
+    db.refresh(new_job)
+
+
     return {
         "filename" : file.filename,
-        "size" : len(contents)
+        "size" : len(contents), 
+        "job_id" : new_job.id
     }

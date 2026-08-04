@@ -31,7 +31,7 @@ async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get
     db.refresh(new_job)
 
     output_path = f"storage/outputs/{new_job.id}.pdf"
-    convert_file_task.delay(filepath , output_path)
+    convert_file_task.delay(filepath , output_path , new_job.id)
 
 
 

@@ -2,6 +2,7 @@ from fastapi import FastAPI , UploadFile , File , HTTPException , Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Job
+from app.models import File as FileModel
 from app.tasks import convert_file_task
 from fastapi.responses import FileResponse
 import os
@@ -30,6 +31,10 @@ async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get
     db.add(new_job)
     db.commit()
     db.refresh(new_job)
+
+    new_file = FileModel(job_id = new_job.id , file_type = "input", original_filename = file.filename , storage_path = filepath , file_size = len(contents))
+    db.add(new_file)
+    db.commit()
 
     output_path = f"storage/outputs/{new_job.id}.pdf"
     convert_file_task.delay(filepath , output_path , new_job.id)
@@ -64,6 +69,7 @@ async def get_job(job_id : int , db : Session = Depends(get_db)):
 async def download_job(job_id : int , db : Session = Depends(get_db)):
     job = db.query(Job).filter(job_id == Job.id).first()
 
+
     if not job : 
         raise HTTPException(status_code=404 , detail="Job doesnt exist")
 
@@ -76,7 +82,14 @@ async def download_job(job_id : int , db : Session = Depends(get_db)):
     if not os.path.exists(output_path):
         raise HTTPException(status_code=404, detail="Output file not found")
 
+    original_file = db.query(FileModel).filter(FileModel.file_type == "input" , FileModel.job_id == job.id).first()
     
-    return FileResponse(path = output_path , filename = f"converted_job{job.id}.{job.target_format}" , media_type="application/octet-stream")
+    if original_file:
+        base_name = os.path.splitext(original_file.original_filename)[0]
+        download_name = f"{base_name}.{job.target_format}"
+    else:
+        download_name = f"converted_job{job.id}.{job.target_format}"
+ 
+    return FileResponse(path = output_path , filename = download_name , media_type="application/octet-stream")
 
     

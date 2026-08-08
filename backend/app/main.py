@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Job
 from app.tasks import convert_file_task
+from fastapi.responses import FileResponse
 import os
 
 app = FastAPI()
@@ -58,3 +59,24 @@ async def get_job(job_id : int , db : Session = Depends(get_db)):
         "completed_at" : job.completed_at,
         "error_message" : job.error_message
     }
+
+@app.get("/jobs/{job_id}/download")
+async def download_job(job_id : int , db : Session = Depends(get_db)):
+    job = db.query(Job).filter(job_id == Job.id).first()
+
+    if not job : 
+        raise HTTPException(status_code=404 , detail="Job doesnt exist")
+
+    if  job.status != "done" : 
+        raise HTTPException(status_code=400 , detail = "Job not ready yet")
+
+    output_path = f"storage/outputs/{job.id}.{job.target_format}"
+
+
+    if not os.path.exists(output_path):
+        raise HTTPException(status_code=404, detail="Output file not found")
+
+    
+    return FileResponse(path = output_path , filename = f"converted_job{job.id}.{job.target_format}" , media_type="application/octet-stream")
+
+    

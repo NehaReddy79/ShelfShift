@@ -41,3 +41,20 @@ async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get
         "job_id" : new_job.id,
         "output_path" : output_path
     }
+
+@app.get("/jobs/{job_id}")
+async def get_job(job_id : int , db : Session = Depends(get_db)):
+    job = db.query(Job).filter(Job.id == job_id).first()
+
+    if not job :
+        raise HTTPException(status_code=404 , detail = "Job not found")
+
+    return{
+        "id" : job.id,
+        "status" : job.status,
+        "source_format" : job.source_format,
+        "target_format" : job.target_format,
+        "created_at" : job.created_at,
+        "completed_at" : job.completed_at,
+        "error_message" : job.error_message
+    }

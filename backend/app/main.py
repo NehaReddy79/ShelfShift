@@ -6,10 +6,19 @@ from app.models import File as FileModel
 from app.tasks import convert_file_task
 from fastapi.responses import FileResponse
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 os.makedirs("storage/uploads/", exist_ok=True)
 os.makedirs("storage/outputs/", exist_ok=True)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173" ,"http://127.0.0.1:8000/" ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 SUPPORTED_CONVERSIONS = {
     "epub": ["pdf", "mobi"],

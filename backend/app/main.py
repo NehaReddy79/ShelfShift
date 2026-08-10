@@ -1,4 +1,4 @@
-from fastapi import FastAPI , UploadFile , File , HTTPException , Depends
+from fastapi import FastAPI , UploadFile , File , HTTPException , Depends , Form
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Job
@@ -11,23 +11,37 @@ app = FastAPI()
 os.makedirs("storage/uploads/", exist_ok=True)
 os.makedirs("storage/outputs/", exist_ok=True)
 
+SUPPORTED_CONVERSIONS = {
+    "epub": ["pdf", "mobi"],
+    "mobi": ["pdf", "epub"],
+    "pdf": ["epub", "mobi", "txt"],
+    "txt": ["pdf"],
+}
+
 @app.get("/")
 def root():
     return {"message" : "Working"}
 
 @app.post("/convert")
-async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get_db)):
+async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get_db) , target_format : str = Form(...)):
     if not file.filename :
         raise HTTPException(status_code=400 , detail = "No file found")
     
     filepath = os.path.join("storage/uploads", file.filename)
+
+    source_format = file.filename.split(".")[-1].lower()
+    
+    if target_format not in SUPPORTED_CONVERSIONS.get(source_format, []):
+        raise HTTPException(status_code=400, detail=f"Cannot convert {source_format} to {target_format}")
 
     contents = await file.read()
 
     with open(filepath , "wb") as buffer : 
         buffer.write(contents)
 
-    new_job = Job(user_id = 1 , status = "queued" , source_format = file.filename.split(".")[-1].lower() , target_format = "pdf")
+   
+
+    new_job = Job(user_id = 1 , status = "queued" , source_format = source_format , target_format = target_format)
     db.add(new_job)
     db.commit()
     db.refresh(new_job)
@@ -36,7 +50,7 @@ async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get
     db.add(new_file)
     db.commit()
 
-    output_path = f"storage/outputs/{new_job.id}.pdf"
+    output_path = f"storage/outputs/{new_job.id}.{target_format}"
     convert_file_task.delay(filepath , output_path , new_job.id)
 
 

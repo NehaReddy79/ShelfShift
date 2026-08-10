@@ -51,7 +51,7 @@ async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get
     db.commit()
 
     output_path = f"storage/outputs/{new_job.id}.{target_format}"
-    convert_file_task.delay(filepath , output_path , new_job.id)
+    convert_file_task.delay(filepath , output_path , new_job.id , source_format , target_format)
 
 
 

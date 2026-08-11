@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import api from "../api"
-import '../App.css'
+import './History.css'
 
 function History() {
 
@@ -27,22 +27,29 @@ function History() {
                     (<p>Loading...</p>) :
                     (
                         (jobs.length > 0) ? (
-                            jobs.map((job) => (
-                                <div key={job.id}>
-                                    <p>File Name : {job.file_name}</p>
-                                    <p>Job id : {job.id}</p>
-                                    <p>{job.source_format} &rarr; {job.target_format}</p>
-                                    <p>Status  : {job.status}</p>
-                                    <p>Created at : {new Date(job.created_at).toLocaleString()}</p>
-                                    <p>Completed at : {job.completed_at ? new Date(job.completed_at).toLocaleString() : "-"}</p>
-                                    {job.status === "done" &&
-                                        <a href={`${import.meta.env.VITE_API_URL}/jobs/${job.id}/download`}>Download</a>
-                                    }
-                                </div>
+                            <div className="history-list">
+                                {jobs.map((job) => (
+                                    <div key={job.id} className="history-card">
 
-                            ))
+                                        <div className="history-info">
+                                            <div className="history-filename">{job.file_name}</div>
+                                            <div className="history-format">{job.source_format} &rarr; {job.target_format}</div>
+                                            <div className="history-date">{new Date(job.created_at).toLocaleString()}</div>
+                                        </div>
+
+                                        <div className="history-right">
+                                            <span className={`status-badge badge-${job.status}`}> {job.status} </span>
+                                            {job.status === "done" &&
+                                                <a href={`${import.meta.env.VITE_API_URL}/jobs/${job.id}/download`} className="history-download">Download</a>
+                                            }
+                                        </div>
+
+                                    </div>
+
+                                ))}
+                            </div>
                         ) : (
-                            <p>No Jobs Done Yet</p>
+                            <p className="empty-state">No jobs yet - convert a file to see it here.</p>
                         )
                         
                 )

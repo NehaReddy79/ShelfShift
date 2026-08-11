@@ -1,6 +1,7 @@
-import {Route , Routes , BrowserRouter , Link} from "react-router-dom"
+import {Route , Routes , BrowserRouter , NavLink} from "react-router-dom"
 import Convert from "./pages/Convert"
 import History from "./pages/History"
+import './components/Navbar.css'
 
 
 
@@ -8,9 +9,14 @@ function App() {
   return(
     <>
       <BrowserRouter>
-        <nav>
-          <Link to="/">Convert</Link>
-          <Link to="/history">History</Link>
+        <nav className="navbar">
+          <NavLink to="/" className={({ isActive }) => isActive? "nav-link active" : "nav-link"}>
+            Convert
+          </NavLink>
+          
+          <NavLink to="/history" className={({ isActive }) => isActive? "nav-link active" : "nav-link"}>
+            History
+          </NavLink>
         </nav>
 
         <Routes>

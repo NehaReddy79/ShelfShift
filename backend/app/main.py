@@ -115,4 +115,24 @@ async def download_job(job_id : int , db : Session = Depends(get_db)):
  
     return FileResponse(path = output_path , filename = download_name , media_type="application/octet-stream")
 
-    
+
+@app.get("/jobs")
+async def list_jobs(db : Session = Depends(get_db)):
+    jobs = db.query(Job).order_by(Job.created_at.desc()).all()
+
+    result = []
+
+    for job in jobs :
+        ip_file = db.query(FileModel).filter(FileModel.file_type == "input" , FileModel.job_id == job.id).first()
+        job_details = {
+            "id" : job.id,
+            "file_name" : ip_file.original_filename if ip_file else "Unknown",
+            "source_format" : job.source_format,
+            "target_format" : job.target_format,
+            "status" : job.status,
+            "created_at" : job.created_at,
+            "completed_at" : job.completed_at 
+        }
+        result.append(job_details)
+
+    return result

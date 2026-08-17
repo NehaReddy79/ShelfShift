@@ -6,13 +6,16 @@ function History() {
 
     const [jobs, setJobs] = useState([])
     const [loading, setLoading] = useState(false)
-
+    const [stats , setStats] = useState(null)
 
     useEffect(() => {
         async function fetchJobs() {
             setLoading(true)
             const resp = await api.get("/jobs")
             setJobs(resp.data)
+
+            const statResp = await api.get("/jobs/stats")
+            setStats(statResp.data)
             setLoading(false)
         }
         fetchJobs()
@@ -27,6 +30,29 @@ function History() {
                     (<p>Loading...</p>) :
                     (
                         (jobs.length > 0) ? (
+                            <>
+                            <div className="stats-strip">
+                                <div className="stat-card">
+                                    <div className="stat-value">{stats.total_jobs}</div>
+                                    <div className="stat-label">Total Jobs </div>
+                                </div>
+
+                                <div className="stat-card">
+                                    <div className="stat-value">{stats.successful_jobs}</div>
+                                    <div className="stat-label">Successful </div>
+                                </div>
+                                
+                                <div className="stat-card">
+                                    <div className="stat-value">{stats.avg_processing_seconds}s</div>
+                                    <div className="stat-label">Avg Time </div>
+                                </div>
+
+                                <div className="stat-card">
+                                    <div className="stat-value">{stats.most_common_pair}</div>
+                                    <div className="stat-label">Most Common </div>
+                                </div>
+
+                            </div>
                             <div className="history-list">
                                 {jobs.map((job) => (
                                     <div key={job.id} className="history-card">
@@ -48,6 +74,7 @@ function History() {
 
                                 ))}
                             </div>
+                            </>
                         ) : (
                             <p className="empty-state">No jobs yet - convert a file to see it here.</p>
                         )

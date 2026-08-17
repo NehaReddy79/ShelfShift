@@ -7,6 +7,7 @@ from app.tasks import convert_file_task
 from fastapi.responses import FileResponse
 import os
 from fastapi.middleware.cors import CORSMiddleware
+from collections import Counter
 
 app = FastAPI()
 os.makedirs("storage/uploads/", exist_ok=True)
@@ -70,6 +71,47 @@ async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get
         "job_id" : new_job.id,
         "output_path" : output_path
     }
+
+
+
+@app.get("/jobs/stats")
+async def job_stats(db : Session = Depends(get_db)):
+    jobs = db.query(Job).all()
+
+    total_jobs = len(jobs)
+    successful_jobs = sum(
+        1 for job in jobs
+        if job.status == "done"
+    )
+
+    done_jobs = [
+        job for job in jobs
+        if job.status == "done"
+        and job.completed_at is not None
+    ]
+
+    if done_jobs:
+        avg_seconds = sum(
+            (job.completed_at - job.created_at).total_seconds()
+            for job in done_jobs
+        ) / len(done_jobs)
+    else:
+        avg_seconds = 0
+
+    pairs = [
+        f"{job.source_format}→{job.target_format}"
+        for job in jobs
+    ]
+
+    most_common = Counter(pairs).most_common(1)
+
+    return {
+        "total_jobs": total_jobs,
+        "successful_jobs": successful_jobs,
+        "avg_processing_seconds": round(avg_seconds, 1),
+        "most_common_pair": most_common[0][0] if most_common else "—"
+    }
+
 
 @app.get("/jobs/{job_id}")
 async def get_job(job_id : int , db : Session = Depends(get_db)):
@@ -136,3 +178,5 @@ async def list_jobs(db : Session = Depends(get_db)):
         result.append(job_details)
 
     return result
+
+

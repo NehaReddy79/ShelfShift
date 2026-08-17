@@ -1,13 +1,15 @@
 from fastapi import FastAPI , UploadFile , File , HTTPException , Depends , Form
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models import Job
+from app.models import Job , User
 from app.models import File as FileModel
 from app.tasks import convert_file_task
 from fastapi.responses import FileResponse
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from collections import Counter
+from app.schemas import UserCreate
+from app.auth import hash_password
 
 app = FastAPI()
 os.makedirs("storage/uploads/", exist_ok=True)
@@ -179,4 +181,19 @@ async def list_jobs(db : Session = Depends(get_db)):
 
     return result
 
+@app.post("/signup")
+def user_signup(user : UserCreate , db : Session = Depends(get_db)) :
+    email_res = db.query(User).filter(User.email == user.email).first()
 
+    if email_res : 
+        raise HTTPException(status_code=400 , detail = "Email already registered")
+
+    hash_pass = hash_password(user.password)
+    new_user = User(email = user.email , hashed_password = hash_pass)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return {"message" : "User Created Successfully" , "user_id" : new_user.id}
+
+    

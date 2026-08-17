@@ -8,8 +8,8 @@ from fastapi.responses import FileResponse
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from collections import Counter
-from app.schemas import UserCreate
-from app.auth import hash_password
+from app.schemas import UserCreate , UserLogin
+from app.auth import hash_password , verify_password , create_access_token
 
 app = FastAPI()
 os.makedirs("storage/uploads/", exist_ok=True)
@@ -195,5 +195,21 @@ def user_signup(user : UserCreate , db : Session = Depends(get_db)) :
     db.refresh(new_user)
 
     return {"message" : "User Created Successfully" , "user_id" : new_user.id}
+
+
+@app.post("/login")
+def user_login(user : UserLogin , db : Session = Depends(get_db)):
+    user_res = db.query(User).filter(User.email == user.email).first()
+    if user_res is None : 
+        raise HTTPException(status_code=401 , detail = "Invalid Credentails")
+
+    if verify_password(user.password , user_res.hashed_password) is False:
+        raise HTTPException(status_code=401 , detail = "Invalid Credentails")
+
+    token = create_access_token({"sub" : str(user_res.id)})
+
+    return {"access_token" : token , "token_type" : "bearer"}
+
+
 
     

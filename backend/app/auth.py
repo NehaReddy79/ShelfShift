@@ -3,7 +3,10 @@ from jose import jwt
 from datetime import datetime , timedelta
 from dotenv import load_dotenv
 import os
-
+from fastapi import Request , Depends
+from sqlalchemy.orm import Session
+from app.database import get_db
+from app.models import User
 
 load_dotenv()
 pwd_context = CryptContext(schemes=["bcrypt"] , deprecated = "auto")
@@ -31,4 +34,19 @@ def decode_access_token(token : str):
     except Exception:
         return None
 
+
+def get_current_user_opt(request : Request , db : Session = Depends(get_db)):
+    auth_header = request.headers.get("Authorization")
+
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return None
+
+    token = auth_header.split(" ")[1]
+    payload = decode_access_token(token)
+    if payload is None : 
+        return None
+
+    user_id = payload.get("sub")
+    user = db.query(User).filter(User.id == int(user_id)).first()
+    return user 
     

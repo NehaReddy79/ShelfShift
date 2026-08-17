@@ -15,7 +15,7 @@ class User(Base):
 class Job(Base):
     __tablename__ = "jobs"
     id : Mapped[int] = mapped_column(primary_key=True, nullable=False)
-    user_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user_id : Mapped[int | None ] = mapped_column(ForeignKey("users.id") , nullable = True)
     status : Mapped[str] = mapped_column()
     source_format : Mapped[str] = mapped_column()
     target_format : Mapped[str] = mapped_column()

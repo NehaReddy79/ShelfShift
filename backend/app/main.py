@@ -9,7 +9,7 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 from collections import Counter
 from app.schemas import UserCreate , UserLogin
-from app.auth import hash_password , verify_password , create_access_token
+from app.auth import hash_password , verify_password , create_access_token , get_current_user_opt
 
 app = FastAPI()
 os.makedirs("storage/uploads/", exist_ok=True)
@@ -35,7 +35,7 @@ def root():
     return {"message" : "Working"}
 
 @app.post("/convert")
-async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get_db) , target_format : str = Form(...)):
+async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get_db) , target_format : str = Form(...) , current_user = Depends(get_current_user_opt)):
     if not file.filename :
         raise HTTPException(status_code=400 , detail = "No file found")
     
@@ -53,7 +53,7 @@ async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get
 
    
 
-    new_job = Job(user_id = 1 , status = "queued" , source_format = source_format , target_format = target_format)
+    new_job = Job(user_id = current_user.id if current_user else None , status = "queued" , source_format = source_format , target_format = target_format)
     db.add(new_job)
     db.commit()
     db.refresh(new_job)

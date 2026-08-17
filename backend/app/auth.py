@@ -3,13 +3,15 @@ from jose import jwt
 from datetime import datetime , timedelta
 from dotenv import load_dotenv
 import os
-from fastapi import Request , Depends
+from fastapi import Request , Depends , HTTPException
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User
 
 load_dotenv()
 pwd_context = CryptContext(schemes=["bcrypt"] , deprecated = "auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 def hash_password(password : str):
     return pwd_context.hash(password)
@@ -49,4 +51,19 @@ def get_current_user_opt(request : Request , db : Session = Depends(get_db)):
     user_id = payload.get("sub")
     user = db.query(User).filter(User.id == int(user_id)).first()
     return user 
+
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    from app.models import User 
+    
+    payload = decode_access_token(token)
+    if payload is None:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    
+    user_id = payload.get("sub")
+    user = db.query(User).filter(User.id == int(user_id)).first()
+    if user is None:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    return user
     

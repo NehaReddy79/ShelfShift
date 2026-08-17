@@ -9,7 +9,7 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 from collections import Counter
 from app.schemas import UserCreate , UserLogin
-from app.auth import hash_password , verify_password , create_access_token , get_current_user_opt
+from app.auth import hash_password , verify_password , create_access_token , get_current_user_opt, get_current_user
 
 app = FastAPI()
 os.makedirs("storage/uploads/", exist_ok=True)
@@ -77,8 +77,8 @@ async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get
 
 
 @app.get("/jobs/stats")
-async def job_stats(db : Session = Depends(get_db)):
-    jobs = db.query(Job).all()
+async def job_stats(db : Session = Depends(get_db), current_user : User = Depends(get_current_user)):
+    jobs = db.query(Job).filter(Job.user_id == current_user.id).all()
 
     total_jobs = len(jobs)
     successful_jobs = sum(
@@ -161,8 +161,8 @@ async def download_job(job_id : int , db : Session = Depends(get_db)):
 
 
 @app.get("/jobs")
-async def list_jobs(db : Session = Depends(get_db)):
-    jobs = db.query(Job).order_by(Job.created_at.desc()).all()
+async def list_jobs(db : Session = Depends(get_db) , current_user : User = Depends(get_current_user)):
+    jobs = db.query(Job).filter(Job.user_id == current_user.id).order_by(Job.created_at.desc()).all()
 
     result = []
 

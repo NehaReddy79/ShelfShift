@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "../api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate , Link } from "react-router-dom";
+import "./Login.css"
 
 export default function Login(){
 
@@ -16,7 +17,7 @@ export default function Login(){
 
             const response = await api.post("/login" , {email,password})
             localStorage.setItem("token" ,  response.data.access_token)
-            navigate("/history")
+            navigate("/")
 
         }catch(err){
             setError(err.response?.data?.detail || "Login failed")
@@ -27,12 +28,25 @@ export default function Login(){
 
     return(
         <>
-            <form onSubmit={handleSubmit}>
-                <input type="email" placeholder="E-mail" value={email} onChange={(e) => {setEmail(e.target.value)}}></input>
-                <input type="password" placeholder="Password" value={password} onChange={(e) => {setPassword(e.target.value)}}></input>
-                <button type="submit">Submit</button>
-            </form>
-            {error && <p className="error-text">{error}</p>}
+            <div className="auth-container">
+                <div className="auth-card">
+                    <h2>Welcome Back</h2>
+                    <p className="auth-subtitle">Log in to view your conversions.</p>
+
+
+                    <form onSubmit={handleSubmit}>
+                        <input type="email" placeholder="E-mail" className="auth-input" value={email} onChange={(e) => { setEmail(e.target.value) }}></input>
+                        <input type="password" placeholder="Password" className="auth-input" value={password} onChange={(e) => { setPassword(e.target.value) }}></input>
+                        <button type="submit" className="auth-submit-btn">Submit</button>
+                    </form>
+
+                    {error && <p className="error-text"> {error} </p>}
+
+                    <p className="auth-switch">
+                        Don't have an account? <Link to="/signup"> Sign Up</Link>
+                    </p>
+                </div>
+            </div>
         </>
     )
 }

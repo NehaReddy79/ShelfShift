@@ -3,3 +3,4 @@ storage/
 *.pdf
 *.mobi
 *.txt
+celerybeat-schedule

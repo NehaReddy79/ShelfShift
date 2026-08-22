@@ -60,7 +60,7 @@ function History() {
                                         <div className="history-info">
                                             <div className="history-filename">{job.file_name}</div>
                                             <div className="history-format">{job.source_format} &rarr; {job.target_format}</div>
-                                            <div className="history-date">{new Date(job.created_at).toLocaleString()}</div>
+                                            <div className="history-date">{new Date(job.created_at + "Z").toLocaleString()}</div>
                                         </div>
 
                                         <div className="history-right">

@@ -24,7 +24,7 @@ function History() {
 
     return (
         <>
-            <div className="app-container">
+            <div className="app-container page-card">
                 <h1>Job History</h1>
                 {loading ?
                     (<p>Loading...</p>) :
@@ -54,8 +54,8 @@ function History() {
 
                             </div>
                             <div className="history-list">
-                                {jobs.map((job) => (
-                                    <div key={job.id} className="history-card">
+                                {jobs.map((job , index) => (
+                                    <div key={job.id} className="history-card" style={{animationDelay : `${index * 0.06}s`}}>
 
                                         <div className="history-info">
                                             <div className="history-filename">{job.file_name}</div>

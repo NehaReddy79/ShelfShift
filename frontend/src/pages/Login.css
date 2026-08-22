@@ -8,7 +8,7 @@
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow: 0px 4px 10px 2px var(--color-accent-hover);
   padding: 2.5rem 2rem;
 }
 
@@ -40,6 +40,7 @@
 .auth-input:focus {
   outline: none;
   border-color: var(--color-accent);
+  box-shadow: 0px 4px 10px 2px var(--color-accent-hover);
 }
 
 .auth-submit-btn {
@@ -59,6 +60,8 @@
 
 .auth-submit-btn:hover {
   background-color: var(--color-accent-hover);
+  box-shadow: 0px 4px 10px 2px var(--color-accent-hover);
+  transform: translateY(-5px);
 }
 
 .auth-switch {

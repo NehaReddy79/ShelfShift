@@ -72,7 +72,7 @@ function Convert() {
 
   return (
     <>
-      <div className="app-container">
+      <div className="app-container page-fade">
 
 
         <div className="app-header">
@@ -82,7 +82,7 @@ function Convert() {
         </div>
 
         {jobStatus?.status !== "done" ? (
-          <div className="card">
+          <div className="card card-entrance">
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label>File</label>

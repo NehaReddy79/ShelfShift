@@ -23,8 +23,8 @@ export default function SignUp() {
 
     return (
         <>
-            <div className="auth-container">
-                <div className="auth-card">
+            <div className="auth-container page-fade">
+                <div className="auth-card card-entrance">
                     <h2>Create Account</h2>
                     <p className="auth-subtitle">Sign up to track your conversions.</p>
 

@@ -28,8 +28,8 @@ export default function Login(){
 
     return(
         <>
-            <div className="auth-container">
-                <div className="auth-card">
+            <div className="auth-container page-fade">
+                <div className="auth-card card-entrance">
                     <h2>Welcome Back</h2>
                     <p className="auth-subtitle">Log in to view your conversions.</p>
 

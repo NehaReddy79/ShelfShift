@@ -116,7 +116,7 @@ def cleanup_old_files():
     db = SessionLocal()
 
     try:
-        job_res = db.query(Job).filter(Job.created_at < (datetime.utcnow() - timedelta(seconds=1))).all()
+        job_res = db.query(Job).filter(Job.created_at < (datetime.utcnow() - timedelta(hours=1))).all()
         for job in job_res:
             input_res = db.query(FileModel).filter(FileModel.job_id == job.id ,FileModel.file_type == "input").first()
 

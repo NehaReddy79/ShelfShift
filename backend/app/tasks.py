@@ -2,8 +2,10 @@ from app.celery_app import celery_app
 import subprocess
 from app.database import SessionLocal
 from app.models import Job
-from datetime import datetime
+from app.models import File as FileModel
+from datetime import datetime , timedelta
 import fitz
+import os
 
 @celery_app.task
 def add(x,y):
@@ -109,4 +111,20 @@ def convert_file_task(input_path , output_path , job_id , source_format , target
         db.close()
 
     
-    
+@celery_app.task
+def cleanup_old_files():
+    db = SessionLocal()
+
+    try:
+        job_res = db.query(Job).filter(Job.created_at < (datetime.utcnow() - timedelta(seconds=1))).all()
+        for job in job_res:
+            input_res = db.query(FileModel).filter(FileModel.job_id == job.id ,FileModel.file_type == "input").first()
+
+            if input_res and os.path.exists(input_res.storage_path):
+                os.remove(input_res.storage_path)
+
+            if os.path.exists(f"storage/outputs/{job.id}.{job.target_format}"):
+                os.remove(f"storage/outputs/{job.id}.{job.target_format}")
+
+    finally : 
+        db.close()

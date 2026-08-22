@@ -149,7 +149,28 @@ function Convert() {
             </div>
           )
         }
-        
+
+        <div className="how-it-works">
+          <h2>How It Works</h2>
+          <div className="steps-grid">
+            <div className="step">
+              <div className="step-number">1</div>
+              <h3>Upload</h3>
+              <p>Select any EPUB, MOBI, PDF, or TXT file from your device.</p>
+            </div>
+            <div className="step">
+              <div className="step-number">2</div>
+              <h3>Convert</h3>
+              <p>Pick your target format and we'll process it in seconds.</p>
+            </div>
+            <div className="step">
+              <div className="step-number">3</div>
+              <h3>Download</h3>
+              <p>Grab your converted file , ready to read anywhere.</p>
+            </div>
+          </div>
+        </div>
+
       </div>
 
 

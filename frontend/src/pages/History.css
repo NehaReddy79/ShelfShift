@@ -65,18 +65,18 @@
 }
 
 .badge-queued, .badge-processing {
-  background-color: #3a2f1a;
-  color: #e8c766;
+  background-color: #fdecd9;
+  color: #a15a1f;
 }
 
 .badge-done {
-  background-color: #1f3a2a;
-  color: #4ade80;
+  background-color: #dcf0e2;
+  color: #2f6b41;
 }
 
 .badge-failed {
-  background-color: #3a2020;
-  color: #f87171;
+  background-color: #fadbd6;
+  color: #c0392b;
 }
 
 .history-download {

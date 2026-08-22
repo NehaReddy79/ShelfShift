@@ -1,13 +1,13 @@
 :root {
-  --color-background: #211a15;
-  --color-surface: #2c231c;
-  --color-text: #f1e8db;
-  --color-text-muted: #b3a696;
-  --color-accent: #6366f1;
-  --color-accent-hover: #818cf8;
-  --color-border: #4a3d31;
-  --color-success: #183f27;
-  --color-error: #f87171;
+  --color-background: #fdfaf6;
+  --color-surface: #ffffff;
+  --color-text: #2b2420;
+  --color-text-muted: #6f655a;
+  --color-accent: #c65d3b;
+  --color-accent-hover: #a84a2c;
+  --color-border: #ecdfd0;
+  --color-success: #4a8a5c;
+  --color-error: #c0392b;
 
   
   --font-heading: "Lora", Georgia, serif;
@@ -15,8 +15,8 @@
 
   
   --radius: 10px;
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
-  --shadow-hover: 0 6px 24px rgba(0, 0, 0, 0.45);
+  --shadow: 0 4px 16px rgba(43, 36, 32, 0.06);
+  --shadow-hover: 0 6px 20px rgba(43, 36, 32, 0.1);
 }
 
 * {

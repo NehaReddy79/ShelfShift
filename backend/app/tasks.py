@@ -4,7 +4,7 @@ from app.database import SessionLocal
 from app.models import Job
 from app.models import File as FileModel
 from datetime import datetime , timedelta
-import fitz
+import pymupdf as fitz
 import os
 
 @celery_app.task

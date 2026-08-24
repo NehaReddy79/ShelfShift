@@ -16,6 +16,7 @@ COPY start.sh .
 RUN chmod +x start.sh
 
 ENV HOME=/app
+ENV QT_QPA_PLATFORM=offscreen
 RUN mkdir -p /app/.config
 
 CMD ["./start.sh"]

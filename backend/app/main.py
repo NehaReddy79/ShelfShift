@@ -15,6 +15,10 @@ app = FastAPI()
 os.makedirs("storage/uploads/", exist_ok=True)
 os.makedirs("storage/outputs/", exist_ok=True)
 
+HEAVY_CONVERSIONS_DISABLED = os.getenv("DISABLE_HEAVY_CONVERSIONS", "false").lower() == "true"
+
+LIGHTWEIGHT_PAIRS = {("pdf", "txt"), ("txt", "pdf")}
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173" ,"http://127.0.0.1:8000/" ],
@@ -45,6 +49,12 @@ async def file_upload(file : UploadFile = File(...) , db : Session = Depends(get
     
     if target_format not in SUPPORTED_CONVERSIONS.get(source_format, []):
         raise HTTPException(status_code=400, detail=f"Cannot convert {source_format} to {target_format}")
+
+    if HEAVY_CONVERSIONS_DISABLED and (source_format, target_format) not in LIGHTWEIGHT_PAIRS:
+        raise HTTPException(
+            status_code=503,
+            detail="This conversion requires more memory than the current free-tier deployment provides. TXT ↔ PDF conversions are available. Full format support works when self-hosted locally."
+        )
 
     contents = await file.read()
 

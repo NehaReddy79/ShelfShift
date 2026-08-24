@@ -99,6 +99,15 @@ def convert_file_task(input_path , output_path , job_id , source_format , target
         db.commit()
         return {"success" : False, "Error" : e.stderr}
 
+
+    except subprocess.TimeoutExpired as e:
+        job.status = "failed"
+        stdout = e.stdout if e.stdout else "(no stdout captured)"
+        stderr = e.stderr if e.stderr else "(no stderr captured)"
+        job.error_message = f"Timed out. stdout: {stdout[:500]} | stderr: {stderr[:500]}"
+        db.commit()
+        return {"success": False, "error": job.error_message}
+
     except Exception as e :
         if job : 
             job.status = "failed"

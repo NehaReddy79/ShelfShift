@@ -15,4 +15,7 @@ EXPOSE 8000
 COPY start.sh .
 RUN chmod +x start.sh
 
+ENV HOME=/app
+RUN mkdir -p /app/.config
+
 CMD ["./start.sh"]

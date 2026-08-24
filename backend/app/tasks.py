@@ -84,7 +84,7 @@ def convert_file_task(input_path , output_path , job_id , source_format , target
             txt_to_pdf(input_path, output_path)
 
         else:
-            process = subprocess.run(['ebook-convert' , input_path , output_path] , check = True, capture_output=True , text=True)
+            process = subprocess.run(['ebook-convert' , input_path , output_path] , check = True, capture_output=True , text=True , timeout=120)
 
         job.status = "done"
         job.completed_at = datetime.utcnow()

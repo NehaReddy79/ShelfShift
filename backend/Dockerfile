@@ -17,6 +17,8 @@ RUN chmod +x start.sh
 
 ENV HOME=/app
 ENV QT_QPA_PLATFORM=offscreen
+ENV QTWEBENGINE_DISABLE_SANDBOX=1
+ENV QTWEBENGINE_CHROMIUM_FLAGS="--no-sandbox --disable-gpu"
 RUN mkdir -p /app/.config
 
 CMD ["./start.sh"]
